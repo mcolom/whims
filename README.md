@@ -1,2 +1,4 @@
 # whims
-whims C++ source code repository
+Whims is an action 3D game written in C++ and glut.
+
+Just a stub for the moment...
