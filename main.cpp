@@ -45,6 +45,7 @@ void init(void) {
 	glShadeModel (GL_FLAT);
 }
 
+/*
 void display(void) {
 	glClear (GL_COLOR_BUFFER_BIT);
 	glColor3f (1.0, 0.0, 0.0);
@@ -77,12 +78,53 @@ void display(void) {
 	glutSwapBuffers();
 	glFlush ();
 }
+*/
+
+void display(void) {
+	glClear (GL_COLOR_BUFFER_BIT);
+	glColor3f (1.0, 0.0, 0.0);
+
+	glLoadIdentity ();
+	
+	//glRasterPos2f(0.5, 0.5);
+	//glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*)"some text");
+	//glutBitmapCharacter(GLUT_STROKE_ROMAN, 's');
+	//glLoadIdentity ();
+	
+	// clear the matrix
+	// viewing transformation
+	gluLookAt (0.0, 0.0, 5.0,   // eye
+	           0.0, 0.0, 0.0,   // center
+	           0.0, 1.0, 0.0);  // up
+	
+	// modeling transformation
+	glScalef (1.0, 1.0, 1.0);
+
+	glutWireCube (2.0);
+	
+	glColor3f (1.0, 1.0, 1.0);
+    //	
+	glPushMatrix();
+		glRotatef(anglex, 1, 0, 0);
+		glRotatef(angley, 0, 1, 0);	
+		glutWireTeapot(1.0);
+		glutSolidTeapot(0.4);
+	glPopMatrix();	
+
+	glutSwapBuffers();
+	glFlush ();
+}
+
+
 
 void reshape (int w, int h) {
 	glViewport (0, 0, (GLsizei) w, (GLsizei) h);
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	gluPerspective(60.0, 1.0, 1.5, 20.0);
+	gluPerspective(60.0,   // fov (field of view) angle y
+	               1.0,    // aspect ratio 
+	               1.5,    // z near
+	               20.0);  // z far
 	glMatrixMode (GL_MODELVIEW);
 }
 
