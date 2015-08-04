@@ -10,9 +10,12 @@ EXEC      = whims
 default: $(EXEC)
 all: $(EXEC)
 
+CVideo.o: CVideo.cpp CVideo.h
+	$(CXX) $(CXXFLAGS) -c CVideo.cpp -o CVideo.o
+
 # ------- Main -------
-$(EXEC):  ./main.o
-	$(CXX)  ./main.o $(LDFLAGS) -o $(EXEC)
+$(EXEC):  CVideo.o main.o
+	$(CXX) CVideo.o main.o $(LDFLAGS) -o $(EXEC)
 
 lint: 
 	$(MAKE) CFLAGS="$(CFLAGS) $(CSTRICT)" CXXFLAGS="$(CXXFLAGS) $(CXXSTRICT)"

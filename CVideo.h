@@ -20,17 +20,32 @@
  *
  */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-#include <vector>
-#include <ctime>
+#ifndef _CVIDEO_H_
+#define _CVIDEO_H_
 
 #include "CVideo.h"
 
-int main(int argc, char **argv) {
-	CVideo *video = new CVideo(600, 600, argc, argv);
+class CVideo {
+	private:
 
-    delete video;
-	return EXIT_SUCCESS;
-}
+	int window_Nx;
+	int window_Ny;
+
+	float anglex;
+	float angley;
+
+	public:
+
+	CVideo(int window_Nx, int window_Ny, int argc, char **argv);
+	~CVideo();
+	
+	void keyboard(unsigned char key, int x, int y);
+	void display();
+	void reshape(int w, int h);
+	void mouse(int button, int state, int x, int y);
+	void mouse_motion(int x, int y);	
+};
+
+static CVideo *cvideo_instance = NULL;
+
+#endif
