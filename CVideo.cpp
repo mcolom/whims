@@ -52,12 +52,21 @@ void do_cvideo_mouse_motion(int x, int y) {
 
 CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
     cvideo_instance	= this;
-    
+
     this->window_Nx = window_Nx;
     this->window_Ny = window_Ny;
 	
 	this->anglex = 0;
 	this->angley = 0;
+	
+	this->camera_x = 0;
+	this->camera_y = 0;
+	this->camera_z = 0;
+	
+	this->camera_angle_x = 0;
+	this->camera_angle_y = 0;
+	this->camera_angle_z = 0;
+	
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
@@ -89,10 +98,13 @@ CVideo::~CVideo() {
 
 void CVideo::display() {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(1.0, 0.0, 0.0);
 
 	glLoadIdentity ();
-	
+
+	gluLookAt(camera_y, 0.0, camera_z,   // eye
+	          0.0, 0.0, 0.0,   // center
+	          0.0, 1.0, 0.0);  // up
+
 	//glRasterPos2f(0.5, 0.5);
 	//glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*)"some text");
 	//glutBitmapCharacter(GLUT_STROKE_ROMAN, 's');
@@ -100,23 +112,45 @@ void CVideo::display() {
 	
 	// clear the matrix
 	// viewing transformation
-	gluLookAt(0.0, 0.0, 5.0,   // eye
-	          0.0, 0.0, 0.0,   // center
-	          0.0, 1.0, 0.0);  // up
 	
 	// modeling transformation
 	glScalef(1.0, 1.0, 1.0);
-
-	glutWireCube(2.0);
 	
-	glColor3f(1.0, 1.0, 1.0);
+	// Axes
+	float XP[3] = {1,0,0},  XN[3] = {-1,0,0}, YP[3] = {0,1,0},
+	      YN[3] = {0,-1,0}, ZP[3] = {0,0,1},  ZN[3] = {0,0,-1},
+	      ORG[3] = {0,0,0};
+	//
+	glBegin(GL_LINES);
+	//
+	glColor3f(1,0,0);
+	glVertex3fv(ORG);
+	glVertex3fv(XP);
+	//
+	glColor3f(0,1,0);
+	glVertex3fv(ORG);
+	glVertex3fv(YP);
+	//
+	glColor3f(0,0,1);
+	glVertex3fv(ORG);
+	glVertex3fv(ZP);
+	//
+	glEnd();
+	
+
+	glColor3f(0.8, 0.2, 0.7);
+	glutSolidCube(0.3);
+	
+	glColor3f(0.3, 0.6, 0.4);
     //	
-	glPushMatrix();
-		glRotatef(anglex, 1, 0, 0);
-		glRotatef(angley, 0, 1, 0);	
-		glutWireTeapot(1.0);
-		glutSolidTeapot(0.4);
-	glPopMatrix();	
+	//glPushMatrix();
+		//glRotatef(anglex, 1, 0, 0);
+		//glRotatef(angley, 0, 1, 0);	
+		glutWireTeapot(0.5);
+		//glutSolidTeapot(0.4);
+	//glPopMatrix();
+	
+	glPopMatrix();
 
 	glutSwapBuffers();
 	glFlush ();
@@ -130,6 +164,8 @@ void CVideo::reshape(int w, int h) {
 	               1.0,    // aspect ratio 
 	               1.5,    // z near
 	               20.0);  // z far
+	this->window_Nx = w;
+	this->window_Ny = h;
 	glMatrixMode (GL_MODELVIEW);
 }
 
@@ -162,11 +198,19 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 }
 
 void CVideo::mouse(int button, int state, int x, int y) {
-	//printf("[%d,%d]\n", x, y);
+	if (button == 0)
+		this->left_button_pressed = (state == 0);
+	else if (button == 2)
+		this->right_button_pressed = (state == 0);
+	printf("left=%d, right=%d\n", this->left_button_pressed,
+	                              this->right_button_pressed);
 }
 
 void CVideo::mouse_motion(int x, int y) {
-    anglex = 3*360*y / this->window_Nx;
-    angley = 3*360*x / this->window_Ny;
+    //anglex = 3*360*y / this->window_Nx;
+    //angley = 3*360*x / this->window_Ny;
+    camera_z = 10*y / this->window_Nx;
+    camera_y = 10*x / this->window_Ny;
+    printf("Camera: [%.2f, %.2f, %.2f]\n", camera_x, camera_y, camera_z);
     glutPostRedisplay();
 }

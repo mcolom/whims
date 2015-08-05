@@ -33,6 +33,17 @@ class CVideo {
 
 	float anglex;
 	float angley;
+	
+	bool left_button_pressed;
+	bool right_button_pressed;
+	
+	float camera_x;
+	float camera_y;
+	float camera_z;
+	
+	float camera_angle_x;
+	float camera_angle_y;
+	float camera_angle_z;
 
 	public:
 
