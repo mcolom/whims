@@ -115,8 +115,8 @@ void CVideo::display() {
 
 	glLoadIdentity ();
 
-	gluLookAt(camera_y, 0.0, camera_z,   // eye (camera position)
-	          0.0, 0.0, camera_z+10.0,   // center (where the camera looks at)
+	gluLookAt(camera_x, camera_y, camera_z,   // eye (camera position)
+	          camera_x, camera_y, camera_z+10.0,   // center (where the camera looks at)
 	          0.0, 1.0, 0.0);  // up
 
 	//glRasterPos2f(0.5, 0.5);
@@ -162,17 +162,53 @@ void CVideo::display() {
 		//glRotatef(angley, 0, 1, 0);	
 		//glutWireTeapot(0.5);
 
- GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
- GLfloat mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
- GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
- GLfloat mat_shininess[] = { 100.0f };
+	GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	GLfloat mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
+	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat mat_shininess[] = { 100.0f };
 		
- glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
- glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
- glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
- glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
- glutSolidTeapot(0.5);
-		
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glutSolidTeapot(0.5);
+	
+	glPushMatrix();
+		glTranslatef(0, 0, 3.0);
+		glutSolidTeapot(0.7);
+	glPopMatrix();
+	//
+	glPushMatrix();
+		glTranslatef(1, 1, 7.0);
+		glutSolidTeapot(0.2);
+	glPopMatrix();
+	//
+	glPushMatrix();
+		glTranslatef(1, 1, 4.0);
+		glutSolidTorus (0.275, 0.85, 8, 15);
+	glPopMatrix();
+	//
+	glPushMatrix();
+		glTranslatef(1, 1, 13.0);
+		glutSolidCone (0.575, 0.35, 12, 15);
+	glPopMatrix();
+	//
+	glPushMatrix();
+		glTranslatef(-3, -1, 13.0);
+		glRotatef(10*this->camera_z, 1, 0, 0);
+		glutSolidTeapot(0.56);
+	glPopMatrix();
+	//
+	
+	//glutWireSphere(0.2, 10, 10);
+	
+	//glPushMatrix();
+		//glTranslatef(this->camera_x, this->camera_y, this->camera_z+10.0);
+		glColor3f(0.8, 0.3, 0.1);
+		glTranslatef(this->camera_x, this->camera_y, this->camera_z+2.0);
+		glutSolidSphere(0.05, 50, 50);
+	//glPopMatrix();
+	
 		//glutSolidTeapot(0.4);
 	//glPopMatrix();
 
@@ -202,11 +238,11 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 			glutLeaveMainLoop();
 			break;
 		case 'o':
-			this->camera_y += desp;
+			this->camera_x += desp;
 			glutPostRedisplay();
 			break;
 		case 'p':
-			this->camera_y -= desp;
+			this->camera_x -= desp;
 			glutPostRedisplay();
 			break;
 		case 'q':
