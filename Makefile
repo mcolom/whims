@@ -13,6 +13,9 @@ all: $(EXEC)
 CVideo.o: CVideo.cpp CVideo.h
 	$(CXX) $(CXXFLAGS) -c CVideo.cpp -o CVideo.o
 
+main.o: main.cpp
+	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
+
 # ------- Main -------
 $(EXEC):  CVideo.o main.o
 	$(CXX) CVideo.o main.o $(LDFLAGS) -o $(EXEC)
@@ -25,4 +28,3 @@ clean:
 
 distclean: clean
 	rm -f $(EXEC)
-
