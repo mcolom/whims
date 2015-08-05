@@ -19,14 +19,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
+#include <cstdio>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+//#include <GL/gl.h>
+//#include <GL/glu.h>
 //
 //#include <GL/glut.h>
 #include <GL/freeglut.h> // To use glutLeaveMainLoop
-
-#include <cstdio>
 
 #include "CVideo.h"
 
@@ -61,7 +60,7 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	
 	this->camera_x = 0;
 	this->camera_y = 0;
-	this->camera_z = 0;
+	this->camera_z = -5.0;
 	
 	this->camera_angle_x = 0;
 	this->camera_angle_y = 0;
@@ -77,6 +76,16 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	glClearColor(0.01, 0.01, 0.2, 0.0);
 	glShadeModel(GL_FLAT);
 
+	// Lighting
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
+	
+	// We want to draw frontal faces with a solid color
+	glPolygonMode(GL_FRONT, GL_FILL);	
+	
+
 	glutDisplayFunc(do_cvideo_display);
 	glutReshapeFunc(do_cvideo_reshape);
 
@@ -87,6 +96,11 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	glutMouseFunc(do_cvideo_mouse);
 	//glutMotionFunc(mouse_motion);
 	glutPassiveMotionFunc(do_cvideo_mouse_motion);
+	
+	gluLookAt(camera_y, 0.0, camera_z,   // eye (camera position)
+	          0.0, 0.0, camera_z+10.0,   // center (where the camera looks at)
+	          0.0, 1.0, 0.0);  // up
+	
 	glutMainLoop();
 
 	printf("CVideo exiting MainLoop...\n");
@@ -97,12 +111,12 @@ CVideo::~CVideo() {
 }
 
 void CVideo::display() {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity ();
 
-	gluLookAt(camera_y, 0.0, camera_z,   // eye
-	          0.0, 0.0, 0.0,   // center
+	gluLookAt(camera_y, 0.0, camera_z,   // eye (camera position)
+	          0.0, 0.0, camera_z+10.0,   // center (where the camera looks at)
 	          0.0, 1.0, 0.0);  // up
 
 	//glRasterPos2f(0.5, 0.5);
@@ -146,14 +160,25 @@ void CVideo::display() {
 	//glPushMatrix();
 		//glRotatef(anglex, 1, 0, 0);
 		//glRotatef(angley, 0, 1, 0);	
-		glutWireTeapot(0.5);
+		//glutWireTeapot(0.5);
+
+ GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+ GLfloat mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
+ GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+ GLfloat mat_shininess[] = { 100.0f };
+		
+ glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+ glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+ glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+ glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+ glutSolidTeapot(0.5);
+		
 		//glutSolidTeapot(0.4);
 	//glPopMatrix();
-	
-	glPopMatrix();
 
-	glutSwapBuffers();
+
 	glFlush ();
+	glutSwapBuffers();
 }
 
 void CVideo::reshape(int w, int h) {
@@ -170,24 +195,26 @@ void CVideo::reshape(int w, int h) {
 }
 
 void CVideo::keyboard(unsigned char key, int x, int y) {
+	float desp = 0.3;
+	
 	switch (key) {
 		case 27:
 			glutLeaveMainLoop();
 			break;
 		case 'o':
-			this->angley -= 15.0;
+			this->camera_y += desp;
 			glutPostRedisplay();
 			break;
 		case 'p':
-			this->angley += 15.0;
+			this->camera_y -= desp;
 			glutPostRedisplay();
 			break;
 		case 'q':
-			this->anglex -= 15.0;
+			this->camera_z += desp;
 			glutPostRedisplay();
 			break;
 		case 'a':
-			this->anglex += 15.0;
+			this->camera_z -= desp;
 			glutPostRedisplay();
 			break;
 
@@ -195,6 +222,7 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 			;
 			//printf("%d (%c)\n", key, key);
 	}
+	printf("Camera: [%.2f, %.2f, %.2f]\n", camera_x, camera_y, camera_z);
 }
 
 void CVideo::mouse(int button, int state, int x, int y) {
@@ -209,8 +237,8 @@ void CVideo::mouse(int button, int state, int x, int y) {
 void CVideo::mouse_motion(int x, int y) {
     //anglex = 3*360*y / this->window_Nx;
     //angley = 3*360*x / this->window_Ny;
-    camera_z = 10*y / this->window_Nx;
-    camera_y = 10*x / this->window_Ny;
+    camera_z = 10.0*y / this->window_Nx;
+    camera_y = 5.0*x / this->window_Ny;
     printf("Camera: [%.2f, %.2f, %.2f]\n", camera_x, camera_y, camera_z);
     glutPostRedisplay();
 }
