@@ -20,20 +20,23 @@
  *
  */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-#include <vector>
-#include <ctime>
+#ifndef _CJOYSTICK_H_
+#define _CJOYSTICK_H_
 
-#include "CVideo.h"
-#include "CJoystick.h"
+class CJoystick {
+	private:
+    
+    char num_axes;
+    char num_buttons;
+    int driver_version;
+    char *name;
 
-int main(int argc, char **argv) {
-	CVideo *video = new CVideo(600, 600, argc, argv);
-	CJoystick *joystick = new CJoystick();
+	public:
 
-    delete joystick;
-    delete video;
-	return EXIT_SUCCESS;
-}
+	CJoystick();
+	~CJoystick();
+	
+	void display();
+};
+
+#endif

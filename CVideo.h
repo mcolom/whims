@@ -23,8 +23,6 @@
 #ifndef _CVIDEO_H_
 #define _CVIDEO_H_
 
-#include "CVideo.h"
-
 class CVideo {
 	private:
 
