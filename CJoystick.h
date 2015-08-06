@@ -19,24 +19,43 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
+ 
+#include <pthread.h>
 
 #ifndef _CJOYSTICK_H_
 #define _CJOYSTICK_H_
 
 class CJoystick {
 	private:
-    
+
+	pthread_t tid;
+	bool run_thread;
+
+	int fd;
+
     char num_axes;
     char num_buttons;
     int driver_version;
     char *name;
-
+    
+    bool button;
+    float angle[4];
+        
 	public:
 
 	CJoystick();
 	~CJoystick();
 	
-	void display();
+	int get_fd();	
+	
+	bool get_button();	
+	void set_button(bool state);
+	float get_angle(int axis);	
+	void set_angle(float angle, int axis);
+	
+	bool thread_active();
 };
+
+static CJoystick *cjoystick_instance = NULL;
 
 #endif

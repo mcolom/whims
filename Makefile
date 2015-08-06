@@ -4,7 +4,7 @@ CSTRICT   = -Wall -Wextra -ansi
 CXXOPT    = -O3
 CXXFLAGS  = $(CXXOPT)
 CXXSTRICT = -Wall -Wextra -ansi
-LDFLAGS   = -lGL -lGLU -lglut
+LDFLAGS   = -lGL -lGLU -lglut -lpthread
 EXEC      = whims
 
 default: $(EXEC)
