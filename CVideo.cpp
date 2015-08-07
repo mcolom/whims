@@ -194,8 +194,8 @@ void CVideo::display() {
 		glutSolidSphere(0.05, 50, 50);
 	glPopMatrix();
 			
-	glRotatef(-45.0 * this->js_x / 1000.0 , 0, 0, 1);
-	glRotatef(-45.0 * this->js_y / 1000.0 , 1, 0, 0);
+	glRotatef(10.0 * this->js_x / 1000.0 , 0, 0, 1);
+	glRotatef(-10.0 * this->js_y / 1000.0 , 1, 0, 0);
 
 	glPushMatrix();
 		glTranslatef(-3, -1, 13.0);
