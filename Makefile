@@ -13,15 +13,18 @@ all: $(EXEC)
 CVideo.o: CVideo.cpp CVideo.h
 	$(CXX) $(CXXFLAGS) -c CVideo.cpp -o CVideo.o
 
-joystick.o: joystick.cpp joystick.h
-	$(CXX) $(CXXFLAGS) -c joystick.cpp -o joystick.o
+#joystick.o: joystick.cpp joystick.h
+#	$(CXX) $(CXXFLAGS) -c joystick.cpp -o joystick.o
 
 main.o: main.cpp
 	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
 
 # ------- Main -------
-$(EXEC):  CVideo.o joystick.o main.o
-	$(CXX) CVideo.o joystick.o main.o $(LDFLAGS) -o $(EXEC)
+#$(EXEC):  CVideo.o joystick.o main.o
+#	$(CXX) CVideo.o joystick.o main.o $(LDFLAGS) -o $(EXEC)
+
+$(EXEC):  CVideo.o main.o
+	$(CXX) CVideo.o main.o $(LDFLAGS) -o $(EXEC)
 
 lint: 
 	$(MAKE) CFLAGS="$(CFLAGS) $(CSTRICT)" CXXFLAGS="$(CXXFLAGS) $(CXXSTRICT)"

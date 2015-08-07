@@ -49,6 +49,20 @@ void do_cvideo_mouse_motion(int x, int y) {
 	cvideo_instance->mouse_motion(x, y);
 }
 
+
+void joystick_callback(unsigned int buttonMask, int x, int y, int z) {
+	cvideo_instance->set_joystick_data(buttonMask, x, y, z);
+}
+
+void CVideo::set_joystick_data(unsigned int buttonMask, int x, int y, int z) {
+	//printf("JS; B: %d, x=%d, y=%d, z=%d\n", buttonMask, x, y, z);	
+	this->js_x = x;
+	this->js_y = y;
+	this->js_z = z;
+	this->js_button = (buttonMask != 0);
+	glutPostRedisplay();
+}
+
 CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
     cvideo_instance	= this;
 
@@ -66,12 +80,14 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	this->camera_angle_y = 0;
 	this->camera_angle_z = 0;
 	
-	
 	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize (window_Nx, window_Ny);
-	glutInitWindowPosition (100, 100);
+	
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(window_Nx, window_Ny);
+	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Whimps");
+	
+	glutJoystickFunc(joystick_callback, 1000/24);
 
 	glClearColor(0.01, 0.01, 0.2, 0.0);
 	glShadeModel(GL_FLAT);
@@ -166,11 +182,27 @@ void CVideo::display() {
 	GLfloat mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
 	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat mat_shininess[] = { 100.0f };
-		
+
 	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	
+	glPushMatrix();
+		glColor3f(0.8, 0.3, 0.1);
+		glTranslatef(this->camera_x, this->camera_y, this->camera_z+2.0);
+		glutSolidSphere(0.05, 50, 50);
+	glPopMatrix();
+			
+	glRotatef(-45.0 * this->js_x / 1000.0 , 0, 0, 1);
+	glRotatef(-45.0 * this->js_y / 1000.0 , 1, 0, 0);
+
+	glPushMatrix();
+		glTranslatef(-3, -1, 13.0);
+		glRotatef(10*this->camera_z, 1, 0, 0);
+		glutSolidTeapot(0.56);
+	glPopMatrix();
+
 	glutSolidTeapot(0.5);
 	
 	glPushMatrix();
@@ -185,7 +217,7 @@ void CVideo::display() {
 	//
 	glPushMatrix();
 		glTranslatef(1, 1, 4.0);
-		glutSolidTorus (0.275, 0.85, 8, 15);
+		glutSolidTorus (0.275, 0.85, 20, 50);
 	glPopMatrix();
 	//
 	glPushMatrix();
@@ -193,20 +225,11 @@ void CVideo::display() {
 		glutSolidCone (0.575, 0.35, 12, 15);
 	glPopMatrix();
 	//
-	glPushMatrix();
-		glTranslatef(-3, -1, 13.0);
-		glRotatef(10*this->camera_z, 1, 0, 0);
-		glutSolidTeapot(0.56);
-	glPopMatrix();
-	//
 	
 	//glutWireSphere(0.2, 10, 10);
 	
 	//glPushMatrix();
 		//glTranslatef(this->camera_x, this->camera_y, this->camera_z+10.0);
-		glColor3f(0.8, 0.3, 0.1);
-		glTranslatef(this->camera_x, this->camera_y, this->camera_z+2.0);
-		glutSolidSphere(0.05, 50, 50);
 	//glPopMatrix();
 	
 		//glutSolidTeapot(0.4);
@@ -239,25 +262,22 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'o':
 			this->camera_x += desp;
-			glutPostRedisplay();
 			break;
 		case 'p':
 			this->camera_x -= desp;
-			glutPostRedisplay();
 			break;
 		case 'q':
 			this->camera_z += desp;
-			glutPostRedisplay();
 			break;
 		case 'a':
 			this->camera_z -= desp;
-			glutPostRedisplay();
 			break;
 
 		default:
 			;
 			//printf("%d (%c)\n", key, key);
 	}
+	glutPostRedisplay();
 	printf("Camera: [%.2f, %.2f, %.2f]\n", camera_x, camera_y, camera_z);
 }
 

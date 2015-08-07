@@ -26,24 +26,40 @@
 #include <vector>
 #include <ctime>
 #include <unistd.h> // [sleep]
+#include <string.h>
+#include <pthread.h>
 
 #include "CVideo.h"
-#include "joystick.h"
 
-int main(int argc, char **argv) {
-	//CVideo *video = new CVideo(600, 600, argc, argv);
-	//CJoystick *joystick = new CJoystick();
-	start_joystick();
-	
+static pthread_t tid_main;
+
+void* main_thread(void *arg) {
 	int counter = 0;
-	while (counter < 5) {
+	while (counter < 100) {
 		printf("Main running (%d)\n", counter);	
 		sleep(3);
 		counter++;
 	}
+	
+	pthread_exit(NULL);
+}
 
-	finish_joystick();	
-    //delete joystick;
-    //delete video;
+int main(int argc, char **argv) {
+	int err = pthread_create(&tid_main, NULL, &main_thread, NULL);
+	if (err != 0)
+		printf("Can't create main thread :[%s]", strerror(err));
+	else
+		printf("Main thread created successfully\n");
+
+	CVideo *video = new CVideo(600, 600, argc, argv);
+	
+	/*int counter = 0;
+	while (counter < 5) {
+		printf("Main running (%d)\n", counter);	
+		sleep(3);
+		counter++;
+	}*/
+
+	delete video;
 	return EXIT_SUCCESS;
 }

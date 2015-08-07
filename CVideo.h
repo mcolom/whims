@@ -42,6 +42,11 @@ class CVideo {
 	float camera_angle_x;
 	float camera_angle_y;
 	float camera_angle_z;
+	
+	int js_x;
+	int js_y;
+	int js_z;
+	bool js_button;
 
 	public:
 
@@ -52,7 +57,8 @@ class CVideo {
 	void display();
 	void reshape(int w, int h);
 	void mouse(int button, int state, int x, int y);
-	void mouse_motion(int x, int y);	
+	void mouse_motion(int x, int y);
+	void set_joystick_data(unsigned int buttonMask, int x, int y, int z);
 };
 
 static CVideo *cvideo_instance = NULL;
