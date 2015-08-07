@@ -29,24 +29,18 @@ class CVideo {
 	int window_Nx;
 	int window_Ny;
 
-	float anglex;
-	float angley;
-	
 	bool left_button_pressed;
 	bool right_button_pressed;
 	
-	float camera_x;
-	float camera_y;
-	float camera_z;
-	
-	float camera_angle_x;
-	float camera_angle_y;
-	float camera_angle_z;
-	
+	float ball_x;
+	float ball_y;
+	float ball_z;
+		
 	int js_x;
 	int js_y;
 	int js_z;
-	bool js_button;
+	bool js_button_left;
+	bool js_button_right;
 
 	public:
 
@@ -59,6 +53,8 @@ class CVideo {
 	void mouse(int button, int state, int x, int y);
 	void mouse_motion(int x, int y);
 	void set_joystick_data(unsigned int buttonMask, int x, int y, int z);
+	void draw_scenario();
+	//void rotate_ball_from_origin(float angle);
 };
 
 static CVideo *cvideo_instance = NULL;

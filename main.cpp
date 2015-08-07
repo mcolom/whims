@@ -35,9 +35,9 @@ static pthread_t tid_main;
 
 void* main_thread(void *arg) {
 	int counter = 0;
-	while (counter < 100) {
+	while (counter < 10) {
 		printf("Main running (%d)\n", counter);	
-		sleep(3);
+		sleep(10);
 		counter++;
 	}
 	
@@ -53,13 +53,8 @@ int main(int argc, char **argv) {
 
 	CVideo *video = new CVideo(600, 600, argc, argv);
 	
-	/*int counter = 0;
-	while (counter < 5) {
-		printf("Main running (%d)\n", counter);	
-		sleep(3);
-		counter++;
-	}*/
-
+	// ...
+	
 	delete video;
 	return EXIT_SUCCESS;
 }

@@ -20,6 +20,7 @@
  *
  */
 #include <cstdio>
+#include <cmath>
 
 //#include <GL/gl.h>
 //#include <GL/glu.h>
@@ -51,15 +52,40 @@ void do_cvideo_mouse_motion(int x, int y) {
 
 
 void joystick_callback(unsigned int buttonMask, int x, int y, int z) {
-	cvideo_instance->set_joystick_data(buttonMask, x, y, z);
+	cvideo_instance->set_joystick_data(buttonMask, x, y, z);	
 }
 
+/*void CVideo::rotate_ball_from_origin(float angle) {
+	// Rotate the ball in the XZ plane
+	float radius = sqrtf(this->ball_x * this->ball_x* +
+						this->ball_z * this->ball_z);
+
+	
+	this->ball_x = sin(180.0*angle/3.14) * radius;
+	this->ball_z = cos(180.0*angle/3.14) * radius;
+	
+}*/
+
 void CVideo::set_joystick_data(unsigned int buttonMask, int x, int y, int z) {
-	//printf("JS; B: %d, x=%d, y=%d, z=%d\n", buttonMask, x, y, z);	
+	printf("JS; B: %d, x=%d, y=%d, z=%d\n", buttonMask, x, y, z);	
 	this->js_x = x;
 	this->js_y = y;
 	this->js_z = z;
-	this->js_button = (buttonMask != 0);
+	
+	// left:64
+	// right: 128
+	
+	this->js_button_left = (buttonMask == 64);
+	this->js_button_right = (buttonMask == 128);
+	
+	if (this->js_button_left)
+		this->ball_x += 0.5;
+	//
+	if (this->js_button_right)
+		this->ball_x -= 0.5;
+		
+	//this->rotate_ball_from_origin(20);
+	
 	glutPostRedisplay();
 }
 
@@ -69,16 +95,9 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
     this->window_Nx = window_Nx;
     this->window_Ny = window_Ny;
 	
-	this->anglex = 0;
-	this->angley = 0;
-	
-	this->camera_x = 0;
-	this->camera_y = 0;
-	this->camera_z = -5.0;
-	
-	this->camera_angle_x = 0;
-	this->camera_angle_y = 0;
-	this->camera_angle_z = 0;
+	this->ball_x = 0;
+	this->ball_y = 0;
+	this->ball_z = -5.0;
 	
 	glutInit(&argc, argv);
 	
@@ -112,10 +131,17 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	glutMouseFunc(do_cvideo_mouse);
 	//glutMotionFunc(mouse_motion);
 	glutPassiveMotionFunc(do_cvideo_mouse_motion);
+
+	GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	GLfloat mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
+	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat mat_shininess[] = { 100.0f };
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 	
-	gluLookAt(camera_y, 0.0, camera_z,   // eye (camera position)
-	          0.0, 0.0, camera_z+10.0,   // center (where the camera looks at)
-	          0.0, 1.0, 0.0);  // up
 	
 	glutMainLoop();
 
@@ -126,13 +152,72 @@ CVideo::~CVideo() {
 	printf("CVideo destroyed\n");
 }
 
+void CVideo::draw_scenario() {
+	/*glPushMatrix();
+		glBegin(GL_QUADS);
+			glVertex3f(-1, 0, 1);
+			glVertex3f(-1, 0, -1);
+			glVertex3f(1, 0, 1);
+			glVertex3f(1, 0, -1);
+		glEnd();
+	glPopMatrix();*/
+	
+	glPushMatrix();
+		glScalef(2.0, 0.1, 2.0);
+		glutSolidCube(1.0);
+	glPopMatrix();
+    //
+	glPushMatrix();
+		glTranslatef(-3, -1, 3.0);
+		glScalef(2.0, 0.1, 2.0);
+		glutSolidCube(1.0);
+	glPopMatrix();
+    //
+	glPushMatrix();
+		glTranslatef(3, -3, 4.0);
+		glScalef(2.0, 0.1, 2.0);
+		glutSolidCube(1.0);
+	glPopMatrix();
+  
+	/*glPushMatrix();
+		glTranslatef(-3, -1, 13.0);
+		glRotatef(10*this->ball_z, 1, 0, 0);
+		glutSolidTeapot(0.56);
+	glPopMatrix();
+
+	glutSolidTeapot(0.5);
+	
+	glPushMatrix();
+		glTranslatef(0, 0, 3.0);
+		glutSolidTeapot(0.7);
+	glPopMatrix();
+	//
+	glPushMatrix();
+		glTranslatef(1, 1, 7.0);
+		glutSolidTeapot(0.2);
+	glPopMatrix();
+	//
+	glPushMatrix();
+		glTranslatef(1, 1, 4.0);
+		glutSolidTorus (0.275, 0.85, 20, 50);
+	glPopMatrix();
+	//
+	glPushMatrix();
+		glTranslatef(1, 1, 13.0);
+		glutSolidCone (0.575, 0.35, 12, 15);
+	glPopMatrix();
+	*/
+}
+
 void CVideo::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity ();
 
-	gluLookAt(camera_x, camera_y, camera_z,   // eye (camera position)
-	          camera_x, camera_y, camera_z+10.0,   // center (where the camera looks at)
+    float dist = 5.0;
+    //
+	gluLookAt(ball_x, ball_y, ball_z - dist,   // eye (camera position)
+	          ball_x, ball_y, ball_z + dist,   // center (where the camera looks at)
 	          0.0, 1.0, 0.0);  // up
 
 	//glRasterPos2f(0.5, 0.5);
@@ -167,74 +252,24 @@ void CVideo::display() {
 	//
 	glEnd();
 	
-
-	glColor3f(0.8, 0.2, 0.7);
-	glutSolidCube(0.3);
-	
 	glColor3f(0.3, 0.6, 0.4);
     //	
 	//glPushMatrix();
 		//glRotatef(anglex, 1, 0, 0);
 		//glRotatef(angley, 0, 1, 0);	
 		//glutWireTeapot(0.5);
-
-	GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	GLfloat mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
-	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat mat_shininess[] = { 100.0f };
-
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 	
+	// Person ball
 	glPushMatrix();
 		glColor3f(0.8, 0.3, 0.1);
-		glTranslatef(this->camera_x, this->camera_y, this->camera_z+2.0);
-		glutSolidSphere(0.05, 50, 50);
+		glTranslatef(this->ball_x, this->ball_y, this->ball_z);
+		glutSolidSphere(0.1, 50, 50);
 	glPopMatrix();
 			
 	glRotatef(10.0 * this->js_x / 1000.0 , 0, 0, 1);
 	glRotatef(-10.0 * this->js_y / 1000.0 , 1, 0, 0);
 
-	glPushMatrix();
-		glTranslatef(-3, -1, 13.0);
-		glRotatef(10*this->camera_z, 1, 0, 0);
-		glutSolidTeapot(0.56);
-	glPopMatrix();
-
-	glutSolidTeapot(0.5);
-	
-	glPushMatrix();
-		glTranslatef(0, 0, 3.0);
-		glutSolidTeapot(0.7);
-	glPopMatrix();
-	//
-	glPushMatrix();
-		glTranslatef(1, 1, 7.0);
-		glutSolidTeapot(0.2);
-	glPopMatrix();
-	//
-	glPushMatrix();
-		glTranslatef(1, 1, 4.0);
-		glutSolidTorus (0.275, 0.85, 20, 50);
-	glPopMatrix();
-	//
-	glPushMatrix();
-		glTranslatef(1, 1, 13.0);
-		glutSolidCone (0.575, 0.35, 12, 15);
-	glPopMatrix();
-	//
-	
-	//glutWireSphere(0.2, 10, 10);
-	
-	//glPushMatrix();
-		//glTranslatef(this->camera_x, this->camera_y, this->camera_z+10.0);
-	//glPopMatrix();
-	
-		//glutSolidTeapot(0.4);
-	//glPopMatrix();
-
+	this->draw_scenario();
 
 	glFlush ();
 	glutSwapBuffers();
@@ -260,17 +295,19 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 		case 27:
 			glutLeaveMainLoop();
 			break;
-		case 'o':
-			this->camera_x += desp;
+		case 'o': {
+			//float radius = x*x + 
+			this->ball_x += desp;
 			break;
+		}
 		case 'p':
-			this->camera_x -= desp;
+			this->ball_x -= desp;
 			break;
 		case 'q':
-			this->camera_z += desp;
+			this->ball_z += desp;
 			break;
 		case 'a':
-			this->camera_z -= desp;
+			this->ball_z -= desp;
 			break;
 
 		default:
@@ -278,7 +315,7 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 			//printf("%d (%c)\n", key, key);
 	}
 	glutPostRedisplay();
-	printf("Camera: [%.2f, %.2f, %.2f]\n", camera_x, camera_y, camera_z);
+	printf("Ball: [%.2f, %.2f, %.2f]\n", ball_x, ball_y, ball_z);
 }
 
 void CVideo::mouse(int button, int state, int x, int y) {
@@ -293,8 +330,8 @@ void CVideo::mouse(int button, int state, int x, int y) {
 void CVideo::mouse_motion(int x, int y) {
     //anglex = 3*360*y / this->window_Nx;
     //angley = 3*360*x / this->window_Ny;
-    camera_z = 10.0*y / this->window_Nx;
-    camera_y = 5.0*x / this->window_Ny;
-    printf("Camera: [%.2f, %.2f, %.2f]\n", camera_x, camera_y, camera_z);
+    ball_z = 10.0*y / this->window_Nx;
+    ball_y = 5.0*x / this->window_Ny;
+    printf("Ball: [%.2f, %.2f, %.2f]\n", ball_x, ball_y, ball_z);
     glutPostRedisplay();
 }
