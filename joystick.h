@@ -22,16 +22,20 @@
  
 #include <pthread.h>
 
-#ifndef _CJOYSTICK_H_
-#define _CJOYSTICK_H_
+#ifndef _JOYSTICK_H_
+#define _JOYSTICK_H_
 
-static bool button;
-static float angle[4];
+struct JoystickData {
+	bool button;
+	float angle[4];
 
-static char num_axes;
-static char num_buttons;
-static int driver_version;
-static char *name;
+	char num_axes;
+	char num_buttons;
+	int driver_version;
+	char *name;
+};
+
+static JoystickData js;
 
 void start_joystick();
 void finish_joystick();

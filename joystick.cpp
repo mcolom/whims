@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <linux/joystick.h>
 #include <pthread.h>
-#include "CJoystick.h"
+#include "joystick.h"
 
 static pthread_t joystick_tid;
 static bool run_joystick_thread;
@@ -55,53 +55,53 @@ void* joystick_thread(void *arg) {
 		num = ev.number % 4;
 		switch (ev.type) {
 			case JS_EVENT_BUTTON:
-				button = (ev.value == 1);
+				js.button = (ev.value == 1);
 				break;
 			case JS_EVENT_AXIS: {
 				float angle_joy = ev.value * 45.0 / 32767.0;
-				angle[num] = angle_joy;
+				js.angle[num] = angle_joy;
 				break;
 			}
 			default:
 				break;
 		}
 		printf("button: %d, [%f, %f, %f, %f]\n",
-		  button,
-		  angle[0], angle[1], angle[2], angle[3]);
+		  js.button,
+		  js.angle[0], js.angle[1], js.angle[2], js.angle[3]);
 	}
-	printf("Thread exiting\n");
+	printf("Joystick thread exiting\n");
 	pthread_exit(NULL);
 }
 
 void get_joystick_info() {	
-	ioctl(fd, JSIOCGAXES, &num_axes);
-	printf("%d axes\n", num_axes);
+	ioctl(fd, JSIOCGAXES, &js.num_axes);
+	printf("%d axes\n", js.num_axes);
 
-	ioctl(fd, JSIOCGBUTTONS, &num_buttons);
-	printf("%d buttons\n", num_buttons);
+	ioctl(fd, JSIOCGBUTTONS, &js.num_buttons);
+	printf("%d buttons\n", js.num_buttons);
 
-	ioctl(fd, JSIOCGVERSION, &driver_version);
-	printf("driver version: %d\n", driver_version);
+	ioctl(fd, JSIOCGVERSION, &js.driver_version);
+	printf("driver version: %d\n", js.driver_version);
 	
-	if (ioctl(fd, JSIOCGNAME(buffer_len), name) < 0)
-		strncpy(name, "???", 4);
+	if (ioctl(fd, JSIOCGNAME(buffer_len), js.name) < 0)
+		strncpy(js.name, "???", buffer_len);
 
-	printf("Joystick name: %s\n", name);
+	printf("Joystick name: %s\n", js.name);
 }
 
 void start_joystick() {
-	name = new char[buffer_len];
+	js.name = new char[buffer_len];
 
 	// open the joystick
 	const char *device = "/dev/input/js0";
-	struct JS_DATA_TYPE js;
+	//struct JS_DATA_TYPE js_data_type;
 	
 	if ((fd = open(device, O_RDONLY)) < 0 ) {
 		fprintf(stderr, "Can't open joystick device %s\n", device);
 		//
-		num_axes = 0;
-		num_buttons = 0;
-		driver_version = -1;
+		js.num_axes = 0;
+		js.num_buttons = 0;
+		js.driver_version = -1;
 		return;
 	}
 	
@@ -116,16 +116,16 @@ void start_joystick() {
 }
 
 void finish_joystick() {
-	printf("CJoystick finishing\n");
+	printf("Joystick finishing\n");
 	
-	printf("Waiting for thread to terminate...\n");
+	printf("Waiting for joystick thread to terminate...\n");
 	run_joystick_thread = false;
 	pthread_cancel(joystick_tid); 	// [ToDo] use select to prevent thread
 							// blocked in read
 	pthread_join(joystick_tid, NULL);
-	printf("Thread joined\n");
+	printf("Joystick thread joined\n");
 
 	close(fd);
 	
-	delete[] name;
+	delete[] js.name;
 }

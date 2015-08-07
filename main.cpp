@@ -28,7 +28,7 @@
 #include <unistd.h> // [sleep]
 
 #include "CVideo.h"
-#include "CJoystick.h"
+#include "joystick.h"
 
 int main(int argc, char **argv) {
 	//CVideo *video = new CVideo(600, 600, argc, argv);
