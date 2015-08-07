@@ -31,120 +31,101 @@
 #include <pthread.h>
 #include "CJoystick.h"
 
+static pthread_t joystick_tid;
+static bool run_joystick_thread;
+
+const int buffer_len = 256;
+
+static int fd;
 
 void* joystick_thread(void *arg) {
 	struct js_event ev;
 	unsigned char num;
 
-	while (cjoystick_instance->thread_active()) {
+	while (run_joystick_thread) {
 		do {
-			int ret = read(cjoystick_instance->get_fd(),
+			int ret = read(fd,
 							&ev,
 							sizeof(struct js_event));
-			printf("read\n");
 			if (ret != sizeof(struct js_event)) {
 				return NULL;
 			}
 		} while (ev.type & JS_EVENT_INIT);
 
-		num = ev.number;
+		num = ev.number % 4;
 		switch (ev.type) {
 			case JS_EVENT_BUTTON:
-				cjoystick_instance->set_button(ev.value == 1);
+				button = (ev.value == 1);
 				break;
 			case JS_EVENT_AXIS: {
-				float angle = ev.value * 45.0 / 32767.0;
-				cjoystick_instance->set_angle(angle, num);
+				float angle_joy = ev.value * 45.0 / 32767.0;
+				angle[num] = angle_joy;
 				break;
 			}
 			default:
 				break;
 		}
 		printf("button: %d, [%f, %f, %f, %f]\n",
-		  cjoystick_instance->get_button(),
-		  cjoystick_instance->get_angle(0), cjoystick_instance->get_angle(1),
-		  cjoystick_instance->get_angle(2), cjoystick_instance->get_angle(3));
+		  button,
+		  angle[0], angle[1], angle[2], angle[3]);
 	}
 	printf("Thread exiting\n");
 	pthread_exit(NULL);
 }
 
-CJoystick::CJoystick() {
-	cjoystick_instance = this;
+void get_joystick_info() {	
+	ioctl(fd, JSIOCGAXES, &num_axes);
+	printf("%d axes\n", num_axes);
+
+	ioctl(fd, JSIOCGBUTTONS, &num_buttons);
+	printf("%d buttons\n", num_buttons);
+
+	ioctl(fd, JSIOCGVERSION, &driver_version);
+	printf("driver version: %d\n", driver_version);
 	
+	if (ioctl(fd, JSIOCGNAME(buffer_len), name) < 0)
+		strncpy(name, "???", 4);
+
+	printf("Joystick name: %s\n", name);
+}
+
+void start_joystick() {
+	name = new char[buffer_len];
+
+	// open the joystick
 	const char *device = "/dev/input/js0";
 	struct JS_DATA_TYPE js;
-
-	// open the joystick 
-	if ((this->fd = open(device, O_RDONLY)) < 0 ) {
-		fprintf(stderr, "Couldn't open joystick device %s\n", device);
+	
+	if ((fd = open(device, O_RDONLY)) < 0 ) {
+		fprintf(stderr, "Can't open joystick device %s\n", device);
 		//
-		this->num_axes = 0;
-		this->num_buttons = 0;
-		this->driver_version = -1;
+		num_axes = 0;
+		num_buttons = 0;
+		driver_version = -1;
 		return;
 	}
 	
-	ioctl(this->fd, JSIOCGAXES, &this->num_axes);
-	printf("%d axes\n", this->num_axes);
+	get_joystick_info();
 
-	ioctl(this->fd, JSIOCGBUTTONS, &this->num_buttons);
-	printf("%d buttons\n", this->num_buttons);
-
-	ioctl(this->fd, JSIOCGVERSION, &this->driver_version);
-	printf("driver version: %d\n", this->driver_version);
-	
-	const int buffer_len = 256;
-	this->name = new char[buffer_len];
-	if (ioctl(this->fd, JSIOCGNAME(buffer_len), this->name) < 0)
-		strncpy(this->name, "???", 4);
-
-	printf("Joystick name: %s\n", this->name);
-	
-	this->run_thread = true;
-	int err = pthread_create(&tid, NULL, &joystick_thread, NULL);
+	run_joystick_thread = true;
+	int err = pthread_create(&joystick_tid, NULL, &joystick_thread, NULL);
 	if (err != 0)
-		printf("\ncan't create thread :[%s]", strerror(err));
+		printf("Can't create joystick thread :[%s]", strerror(err));
 	else
-		printf("\n Thread created successfully\n");
-	
-	//joystick_get_input(fd);
+		printf("Joystick thread created successfully\n");
 }
 
-CJoystick::~CJoystick() {
-	printf("CJoystick destroyed\n");
+void finish_joystick() {
+	printf("CJoystick finishing\n");
 	
 	printf("Waiting for thread to terminate...\n");
-	close(this->fd);
-	this->run_thread = false;
-	pthread_cancel(this->tid); 	// [ToDo] use select to prevent thread
-								// blocked in read
-	pthread_join(this->tid, NULL);
+	run_joystick_thread = false;
+	pthread_cancel(joystick_tid); 	// [ToDo] use select to prevent thread
+							// blocked in read
+	pthread_join(joystick_tid, NULL);
 	printf("Thread joined\n");
+
+	close(fd);
 	
-	delete[] this->name;
-}
-
-int CJoystick::get_fd() {
-	return this->fd;
-}
-
-bool CJoystick::get_button() {
-	return this->button;
-}
-
-void CJoystick::set_button(bool state) {
-	this->button = state;
-}
-
-float CJoystick::get_angle(int axis) {
-	return this->angle[axis];
-}
-
-void CJoystick::set_angle(float angle, int axis) {
-	this->angle[axis] = angle;
-}
-
-bool CJoystick::thread_active() {
-	return this->run_thread;
+	delete[] name;
 }

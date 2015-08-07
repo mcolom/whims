@@ -25,37 +25,15 @@
 #ifndef _CJOYSTICK_H_
 #define _CJOYSTICK_H_
 
-class CJoystick {
-	private:
+static bool button;
+static float angle[4];
 
-	pthread_t tid;
-	bool run_thread;
+static char num_axes;
+static char num_buttons;
+static int driver_version;
+static char *name;
 
-	int fd;
-
-    char num_axes;
-    char num_buttons;
-    int driver_version;
-    char *name;
-    
-    bool button;
-    float angle[4];
-        
-	public:
-
-	CJoystick();
-	~CJoystick();
-	
-	int get_fd();	
-	
-	bool get_button();	
-	void set_button(bool state);
-	float get_angle(int axis);	
-	void set_angle(float angle, int axis);
-	
-	bool thread_active();
-};
-
-static CJoystick *cjoystick_instance = NULL;
+void start_joystick();
+void finish_joystick();
 
 #endif

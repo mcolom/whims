@@ -32,7 +32,8 @@
 
 int main(int argc, char **argv) {
 	//CVideo *video = new CVideo(600, 600, argc, argv);
-	CJoystick *joystick = new CJoystick();
+	//CJoystick *joystick = new CJoystick();
+	start_joystick();
 	
 	int counter = 0;
 	while (counter < 5) {
@@ -41,7 +42,8 @@ int main(int argc, char **argv) {
 		counter++;
 	}
 
-    delete joystick;
+	finish_joystick();	
+    //delete joystick;
     //delete video;
 	return EXIT_SUCCESS;
 }
