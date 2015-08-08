@@ -185,6 +185,24 @@ void CVideo::draw_scenario() {
 		glScalef(2.0, 0.1, 2.0);
 		glutSolidCube(1.0);
 	glPopMatrix();
+    //
+	glPushMatrix();
+		glTranslatef(3, -3, 4.0);
+		glScalef(3.0, 0.1, 2.0);
+		glutSolidCube(1.0);
+	glPopMatrix();
+    //
+	glPushMatrix();
+		glTranslatef(-3, 4, 6.0);
+		glScalef(2.0, 0.1, 2.0);
+		glutSolidCube(1.0);
+	glPopMatrix();
+    //
+	glPushMatrix();
+		glTranslatef(2, 3, 0.0);
+		glScalef(2.0, 0.1, 2.0);
+		glutSolidCube(1.0);
+	glPopMatrix();
   
 	/*glPushMatrix();
 		glTranslatef(-3, -1, 13.0);
