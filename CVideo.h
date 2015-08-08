@@ -41,6 +41,8 @@ class CVideo {
 	int js_z;
 	bool js_button_left;
 	bool js_button_right;
+	
+	void rotate_ball_from_origin(float desp);
 
 	public:
 
@@ -54,7 +56,6 @@ class CVideo {
 	void mouse_motion(int x, int y);
 	void set_joystick_data(unsigned int buttonMask, int x, int y, int z);
 	void draw_scenario();
-	//void rotate_ball_from_origin(float angle);
 };
 
 static CVideo *cvideo_instance = NULL;

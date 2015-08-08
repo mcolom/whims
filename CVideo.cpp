@@ -55,19 +55,25 @@ void joystick_callback(unsigned int buttonMask, int x, int y, int z) {
 	cvideo_instance->set_joystick_data(buttonMask, x, y, z);	
 }
 
-/*void CVideo::rotate_ball_from_origin(float angle) {
-	// Rotate the ball in the XZ plane
-	float radius = sqrtf(this->ball_x * this->ball_x* +
-						this->ball_z * this->ball_z);
+// Rotate 10 degrees
+void CVideo::rotate_ball_from_origin(float desp) {
+	float angle = atan2(this->ball_z, this->ball_x);
+	
+	printf("Angle == %f, (x,z) == (%f, %f)\n", angle, this->ball_x, this->ball_z);
+	angle += desp;
 
+	float radius = sqrtf(this->ball_x * this->ball_x +
+						 this->ball_z * this->ball_z);
+	//printf("DDD %f %f %f %f %f %f\n", this->ball_x, this->ball_x*this->ball_x, this->ball_z, this->ball_z*this->ball_z, this->ball_x * this->ball_x + this->ball_z * this->ball_z, sqrtf(this->ball_x * this->ball_x + this->ball_z * this->ball_z));
 	
-	this->ball_x = sin(180.0*angle/3.14) * radius;
-	this->ball_z = cos(180.0*angle/3.14) * radius;
+	this->ball_z = radius * sin(angle);
+	this->ball_x = radius * cos(angle);
 	
-}*/
+	printf("radius == %f, (x,z) == (%f, %f)\n", radius, this->ball_x, this->ball_z);
+}
 
 void CVideo::set_joystick_data(unsigned int buttonMask, int x, int y, int z) {
-	printf("JS; B: %d, x=%d, y=%d, z=%d\n", buttonMask, x, y, z);	
+	//printf("JS; B: %d, x=%d, y=%d, z=%d\n", buttonMask, x, y, z);	
 	this->js_x = x;
 	this->js_y = y;
 	this->js_z = z;
@@ -79,12 +85,13 @@ void CVideo::set_joystick_data(unsigned int buttonMask, int x, int y, int z) {
 	this->js_button_right = (buttonMask == 128);
 	
 	if (this->js_button_left)
-		this->ball_x += 0.5;
+		//this->ball_x += 0.5;
+		this->rotate_ball_from_origin(0.1);
 	//
 	if (this->js_button_right)
-		this->ball_x -= 0.5;
+		//this->ball_x -= 0.5;
+		this->rotate_ball_from_origin(-0.1);
 		
-	//this->rotate_ball_from_origin(20);
 	
 	glutPostRedisplay();
 }
@@ -216,7 +223,7 @@ void CVideo::display() {
 
     float dist = 5.0;
     //
-	gluLookAt(ball_x, ball_y, ball_z - dist,   // eye (camera position)
+	gluLookAt(ball_x, ball_y + 0.05*ball_x*ball_z, ball_z - dist + 0.05*ball_z*ball_z,   // eye (camera position)
 	          ball_x, ball_y, ball_z + dist,   // center (where the camera looks at)
 	          0.0, 1.0, 0.0);  // up
 
