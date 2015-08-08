@@ -101,6 +101,8 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 
     this->window_Nx = window_Nx;
     this->window_Ny = window_Ny;
+    
+    this->fov = 70.0;
 	
 	this->ball_x = 0;
 	this->ball_y = 0;
@@ -241,7 +243,7 @@ void CVideo::display() {
 
     float dist = 5.0;
     //
-	gluLookAt(ball_x, ball_y + 0.05*ball_x*ball_z, ball_z - dist + 0.05*ball_z*ball_z,   // eye (camera position)
+	gluLookAt(ball_x, ball_y + dist-4.0 + 0.05*ball_x*ball_z, ball_z - dist + 0.05*ball_z*ball_z,   // eye (camera position)
 	          ball_x, ball_y, ball_z + dist,   // center (where the camera looks at)
 	          0.0, 1.0, 0.0);  // up
 
@@ -302,15 +304,15 @@ void CVideo::display() {
 
 void CVideo::reshape(int w, int h) {
 	glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-	glMatrixMode (GL_PROJECTION);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity ();
-	gluPerspective(60.0,   // fov (field of view) angle y
-	               1.0,    // aspect ratio 
-	               1.5,    // z near
-	               20.0);  // z far
+	gluPerspective(this->fov,   // fov (field of view) angle y
+	               1.0,    		// aspect ratio 
+	               1.5,    		// z near
+	               20.0);  		// z far
 	this->window_Nx = w;
 	this->window_Ny = h;
-	glMatrixMode (GL_MODELVIEW);
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void CVideo::keyboard(unsigned char key, int x, int y) {
@@ -321,7 +323,6 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 			glutLeaveMainLoop();
 			break;
 		case 'o': {
-			//float radius = x*x + 
 			this->ball_x += desp;
 			break;
 		}
@@ -334,7 +335,12 @@ void CVideo::keyboard(unsigned char key, int x, int y) {
 		case 'a':
 			this->ball_z -= desp;
 			break;
-
+		case 'y':
+			this->ball_y += desp;
+			break;
+		case 'h':
+			this->ball_y -= desp;
+			break;
 		default:
 			;
 			//printf("%d (%c)\n", key, key);

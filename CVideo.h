@@ -28,6 +28,8 @@ class CVideo {
 
 	int window_Nx;
 	int window_Ny;
+	float fov;
+	
 
 	bool left_button_pressed;
 	bool right_button_pressed;
