@@ -45,6 +45,10 @@ class CVideo {
 	bool js_button_right;
 	
 	void rotate_ball_from_origin(float desp);
+	void put_rectangle(float x,  float y,  float z,
+					   float rx, float ry, float rz,
+					   float sx, float sy, float sz);
+	
 
 	public:
 
