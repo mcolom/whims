@@ -322,15 +322,17 @@ void CVideo::display() {
 		glutSolidSphere(0.1, 50, 50);
 	glPopMatrix();
 	
-	// Rotate scenario
-	// [ToDo] Rotate around the ball, not origin
+	// Rotate scenario around the ball
 	glPushMatrix();
-		//glTranslatef(this->ball_x, this->ball_y, this->ball_z); // Around the ball
+		// Center the world in the ball
+		glTranslatef(this->ball_x, this->ball_y, this->ball_z);
+		
+		// Rotate around the ball
 		glRotatef(10.0 * this->js_x / 1000.0 , 0, 0, 1);
 		glRotatef(-10.0 * this->js_y / 1000.0 , 1, 0, 0);
 		
-		
-		//glTranslatef(6,6,6);
+		// Get back to the original position
+		glTranslatef(-this->ball_x, -this->ball_y, -this->ball_z);
 		
 		this->draw_scenario();
 	glPopMatrix();
