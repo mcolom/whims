@@ -96,6 +96,80 @@ void CVideo::set_joystick_data(unsigned int buttonMask, int x, int y, int z) {
 	glutPostRedisplay();
 }
 
+GLuint CVideo::create_scenario() {
+	GLuint scenario_list_id = glGenLists(1);
+	glNewList(scenario_list_id, GL_COMPILE);
+
+	/*this->put_rectangle(0, 0, 0,
+						0, 45, -20,
+						2, 0.1, 2);
+
+	this->put_rectangle(0, 0, 3,
+						30, 0, 0,
+						2, 0.1, 2);
+
+	//glEndList(); return scenario_list_id;
+
+
+    for (int i = 0; i < 90; i += 10)
+		this->put_rectangle(0, 0, 6,
+							i, 0, 0,
+							2, 0.1, 2);
+
+    for (int i = 0; i < 90; i += 10)
+		this->put_rectangle(0, 6, 0,
+							0, i, 0,
+							2, 0.1, 2);
+
+    for (int i = 0; i < 90; i += 10)
+		this->put_rectangle(6, 0, 0,
+							0, 0, i,
+							2, 0.1, 2);*/
+
+	
+	/*glPushMatrix();
+		glBegin(GL_QUADS);
+			glVertex3f(-1, 0, 1);
+			glVertex3f(-1, 0, -1);
+			glVertex3f(1, 0, 1);
+			glVertex3f(1, 0, -1);
+		glEnd();
+	glPopMatrix();*/	
+	
+    //
+	this->put_rectangle(-3, -1, 3,
+						0, 0, 10,
+						2, 0.1, 2);	
+    //
+	this->put_rectangle(4, -3, 4.0,
+						0, 0, 5,
+						2, 0.1, 2);
+    //
+	this->put_rectangle(3, -4, 4.0,
+						0, 0, 2,
+						3, 0.1, 2);
+    //
+	this->put_rectangle(3, 4, 6.0,
+						0, 0, -5,
+						2, 0.1, 2);
+    //
+	this->put_rectangle(-2, 3, 0,
+						0, 6, 0,
+						2, 0.1, 2);
+  
+	/*glPushMatrix();
+		glTranslatef(-3, -1, 13.0);
+		glRotatef(10*this->ball_z, 1, 0, 0);
+		glutSolidTeapot(0.56);
+	glPopMatrix();
+
+	glutSolidTeapot(0.5);*/
+
+	glEndList();
+	
+	return scenario_list_id;
+}
+
 CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
     cvideo_instance	= this;
 
@@ -113,7 +187,7 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(window_Nx, window_Ny);
 	glutInitWindowPosition(700, 100);
-	glutCreateWindow("Whimps");
+	glutCreateWindow("Whims");
 	
 	glutJoystickFunc(joystick_callback, 1000/24);
 
@@ -141,6 +215,7 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	//glutMotionFunc(mouse_motion);
 	glutPassiveMotionFunc(do_cvideo_mouse_motion);
 
+	// Light
 	GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
 	GLfloat mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
 	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -151,10 +226,11 @@ CVideo::CVideo(int window_Nx, int window_Ny, int argc, char **argv) {
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 	
+	// Create an OpenGL list for the scenario
+	this->scenario_list_id = this->create_scenario();
 	
+	// Run forever!
 	glutMainLoop();
-
-	printf("CVideo exiting MainLoop...\n");
 }
 
 CVideo::~CVideo() {
@@ -165,77 +241,29 @@ void CVideo::put_rectangle(float x,  float y,  float z,
                            float rx, float ry, float rz,
                            float sx, float sy, float sz) {
 	glPushMatrix();		
-		// Rotation
-		glTranslatef(0, 0, 0);
+		// Put in its position
+		glTranslatef(x, y, z);
+		//glTranslatef(0, 0, 10);
 
+		// Rotation
 	    glRotatef(rx, 1, 0, 0);
 	    glRotatef(ry, 0, 1, 0);
 	    glRotatef(rz, 0, 0, 1);
-	
-		// Put in its position
-		glTranslatef(x, y, z);
 
 		// Change its size.
 		// This should be the last to avoid changing the units!
 		glScalef(sx, sy, sz);
 				
 		// Add the rectangle
-		glutSolidTeapot(1.0);
-		//glutSolidCube(1.0);
+		//glutSolidTeapot(1.0);
+		glutSolidCube(1.0);
 		//glutWireCube(1.0);
 	glPopMatrix();
 }
 
 void CVideo::draw_scenario() {
-	/*glPushMatrix();
-		glBegin(GL_QUADS);
-			glVertex3f(-1, 0, 1);
-			glVertex3f(-1, 0, -1);
-			glVertex3f(1, 0, 1);
-			glVertex3f(1, 0, -1);
-		glEnd();
-	glPopMatrix();*/	
-
-	this->put_rectangle(0, 0, 0,
-						0, 0, 0,
-						2, 0.1, 2);
-
-
-    for (int i = 10; i < 140; i += 10) {
-		this->put_rectangle(0, 0, 6,
-							0, i, 0,
-							2, 0.1, 2);
-	}
-	
-    //
-    /*    	
-	this->put_rectangle(-3, -1, 3,
-						0, 0, 10,
-						2, 0.1, 2);	
-    //
-	this->put_rectangle(3, -3, 4.0,
-						0, 0, 0,
-						2, 0.1, 2);
-    //
-	this->put_rectangle(3, -3, 4.0,
-						0, 0, 0,
-						3, 0.1, 2);
-    //
-	this->put_rectangle(3, 4, 6.0,
-						0, 0, 0,
-						2, 0.1, 2);
-    //
-	this->put_rectangle(2, 3, 0,
-						0, 0, 0,
-						2, 0.1, 2);*/
-  
-	/*glPushMatrix();
-		glTranslatef(-3, -1, 13.0);
-		glRotatef(10*this->ball_z, 1, 0, 0);
-		glutSolidTeapot(0.56);
-	glPopMatrix();
-
-	glutSolidTeapot(0.5);*/
+	glCallList(this->scenario_list_id);
+	return;
 }
 
 void CVideo::display() {
@@ -245,7 +273,11 @@ void CVideo::display() {
 
     float dist = 5.0;
     //
-	gluLookAt(ball_x + 0.05*ball_x*ball_x, ball_y + dist-4.0 + 0.05*ball_y*ball_y, ball_z - dist + 0.05*ball_z*ball_z,   // eye (camera position)
+    float effect_x = 0*0.05*ball_x*ball_x;
+    float effect_y = 0*0.05*ball_y*ball_y;
+    float effect_z = 0*0.05*ball_z*ball_z;
+    
+	gluLookAt(ball_x + effect_x, ball_y + 0.5*dist + effect_y, ball_z - dist + effect_z,   // eye (camera position)
 	          ball_x, ball_y, ball_z + dist,   // center (where the camera looks at)
 	          0.0, 1.0, 0.0);  // up
 
@@ -291,10 +323,20 @@ void CVideo::display() {
 	glPopMatrix();
 	
 	// Rotate scenario
-	glRotatef(10.0 * this->js_x / 1000.0 , 0, 0, 1);
-	glRotatef(-10.0 * this->js_y / 1000.0 , 1, 0, 0);
+	// [ToDo] Rotate around the ball, not origin
+	glPushMatrix();
+		//glTranslatef(this->ball_x, this->ball_y, this->ball_z); // Around the ball
+		glRotatef(10.0 * this->js_x / 1000.0 , 0, 0, 1);
+		glRotatef(-10.0 * this->js_y / 1000.0 , 1, 0, 0);
+		
+		
+		//glTranslatef(6,6,6);
+		
+		this->draw_scenario();
+	glPopMatrix();
+	
+	
 
-	this->draw_scenario();
 
 	glFlush ();
 	glutSwapBuffers();

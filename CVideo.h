@@ -30,7 +30,6 @@ class CVideo {
 	int window_Ny;
 	float fov;
 	
-
 	bool left_button_pressed;
 	bool right_button_pressed;
 	
@@ -44,7 +43,10 @@ class CVideo {
 	bool js_button_left;
 	bool js_button_right;
 	
+	GLuint scenario_list_id;
+	
 	void rotate_ball_from_origin(float desp);
+	GLuint create_scenario();
 	void put_rectangle(float x,  float y,  float z,
 					   float rx, float ry, float rz,
 					   float sx, float sy, float sz);
