@@ -44,7 +44,26 @@ void* main_thread(void *arg) {
 	pthread_exit(NULL);
 }
 
+bool check_joystick(const char *device) {
+	FILE *f = fopen(device, "r");
+	bool joystick_detected = (f != NULL);
+	if (joystick_detected)
+		fclose(f);
+	return joystick_detected;
+	
+}
+
 int main(int argc, char **argv) {
+	// Check if the joystick is available
+	// If not, just leave!
+	const char *joystick_device = "/dev/input/js0";
+	if (!check_joystick(joystick_device)) {
+		fprintf(stderr, "Can't open joystick device %s!\n",
+		  joystick_device);
+		return EXIT_FAILURE;
+	}
+	
+	
 	int err = pthread_create(&tid_main, NULL, &main_thread, NULL);
 	if (err != 0)
 		printf("Can't create main thread :[%s]", strerror(err));
