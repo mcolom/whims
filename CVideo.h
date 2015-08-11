@@ -23,36 +23,56 @@
 #ifndef _CVIDEO_H_
 #define _CVIDEO_H_
 
+
+#include <vector>
+
 #include <GL/gl.h>
+
+
+using namespace std;
+
+class CRectangle {
+	private:
+
+	float x, y, z; 		// Position
+	float rx, ry, rz; 	// Rotation
+	float sx, sy, sz; 	// Scaling
+	
+	public:
+	
+	CRectangle(float x, float y, float z,
+			   float rx, float ry, float rz,
+			   float sx, float sy, float sz) {
+	}
+};
 
 class CVideo {
 	private:
 
-	int window_Nx;
-	int window_Ny;
-	float fov;
+	int window_Nx, window_Ny; // Window size
+	float fov; // Field of view of the camera
 	
-	bool left_button_pressed;
-	bool right_button_pressed;
+	bool left_button_pressed, right_button_pressed; // Mouse buttons
 	
-	float ball_x;
-	float ball_y;
-	float ball_z;
+	float ball_x, ball_y, ball_z; // Ball position
 		
-	int js_x;
-	int js_y;
-	int js_z;
-	bool js_button_left;
-	bool js_button_right;
+	int js_x, js_y, js_z; // Joystick axes
+	bool js_button_left, js_button_right; // Joystick buttons
 	
-	GLuint scenario_list_id;
+	vector<CRectangle> rectangles; // All rectangles in the scenario
+
+	GLuint scenario_list_id; // GLUT list to draw the scenario
 	
 	void rotate_ball_from_origin(float desp);
 	GLuint create_scenario();
+
 	void put_rectangle(float x,  float y,  float z,
 					   float rx, float ry, float rz,
 					   float sx, float sy, float sz);
-	
+
+	void add_rectangle(float x,  float y,  float z,
+					   float rx, float ry, float rz,
+					   float sx, float sy, float sz);
 
 	public:
 

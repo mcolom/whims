@@ -21,6 +21,7 @@
  */
 #include <cstdio>
 #include <cmath>
+#include <vector>
 
 //#include <GL/gl.h>
 //#include <GL/glu.h>
@@ -97,6 +98,9 @@ void CVideo::set_joystick_data(unsigned int buttonMask, int x, int y, int z) {
 }
 
 GLuint CVideo::create_scenario() {
+	// Empty the list of rectangles in the scenario
+	this->rectangles.clear();	
+	
 	GLuint scenario_list_id = glGenLists(1);
 	glNewList(scenario_list_id, GL_COMPILE);
 
@@ -166,6 +170,8 @@ GLuint CVideo::create_scenario() {
 	glutSolidTeapot(0.5);*/
 
 	glEndList();
+	
+	printf("Scenario created, %d rectangles\n", this->rectangles.size());
 	
 	return scenario_list_id;
 }
@@ -237,9 +243,25 @@ CVideo::~CVideo() {
 	printf("CVideo destroyed\n");
 }
 
+void CVideo::add_rectangle(float x,  float y,  float z,
+                           float rx, float ry, float rz,
+                           float sx, float sy, float sz) {
+	CRectangle rect(x, y, z,
+				    rx, ry, rz,
+					sx, sy, sz);
+	this->rectangles.push_back(rect);
+}
+
 void CVideo::put_rectangle(float x,  float y,  float z,
                            float rx, float ry, float rz,
                            float sx, float sy, float sz) {
+							   
+	// Add the rectangle to the list of rectangles
+	this->add_rectangle(x, y, z,
+						rx, ry, rz,
+						sx, sy, sz);
+
+	// Add the rectangle to the OpenGL scene
 	glPushMatrix();		
 		// Put in its position
 		glTranslatef(x, y, z);
